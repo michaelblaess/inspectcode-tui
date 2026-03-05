@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import json
 import time
+from fnmatch import fnmatch
 from pathlib import Path
 
 from textual import work
@@ -62,7 +64,9 @@ class InspectCodeApp(App):
         Binding("slash", "focus_filter", "Filter", key_display="/"),
         Binding("escape", "clear_filter", "Filter leeren", show=False),
         Binding("r", "copy_row", "Row kopieren"),
-        Binding("w", "open_wiki", "JetBrains Wiki"),
+        Binding("w", "toggle_whitelist", "Whitelist AN"),
+        Binding("a", "add_to_whitelist", "Whitelisten"),
+        Binding("j", "open_wiki", "JetBrains Wiki"),
         Binding("c", "copy_log", "Log kopieren"),
         Binding("x", "clear_log", "Log leeren"),
         Binding("i", "show_about", "Info"),
@@ -100,6 +104,8 @@ class InspectCodeApp(App):
         self._scan_start_time: float = 0
         self._scan_progress_timer: Timer | None = None
         self._git_changed_files: list[str] = []
+        self._whitelist_active: bool = True
+        self._all_findings: list[Finding] = []
 
         # Theme aus Settings uebernehmen
         self.theme = self._settings.theme
@@ -175,18 +181,88 @@ class InspectCodeApp(App):
                 f"in {len(self._git_changed_files)} geaenderten Dateien"
             )
 
-        # UI aktualisieren
+        # Alle Findings (vor Whitelist) merken
+        self._all_findings = list(self._findings)
+
+        # Whitelist anwenden
+        if self._whitelist_active:
+            whitelist_count = self._apply_whitelist()
+            if whitelist_count > 0:
+                self._write_log(
+                    f"[dim]Whitelist: {whitelist_count} Findings ignoriert[/dim]"
+                )
+
+        self._refresh_findings_ui(report_path)
+
+    def _refresh_findings_ui(self, report_path: str = "") -> None:
+        """Aktualisiert die Findings-Tabelle und Summary."""
         table = self.query_one("#findings-table", FindingsTable)
         table.load_findings(self._findings)
 
+        solution_name = self._report.solution_name if self._report else ""
         summary = self.query_one("#summary", SummaryPanel)
-        summary.update_findings(self._findings, self._report.solution_name)
+        summary.update_findings(self._findings, solution_name)
 
-        self._write_log(f"[green]Geladen: {report_path}[/green]")
-        self._write_log(f"Solution: {self._report.solution_name}")
+        if report_path:
+            self._write_log(f"[green]Geladen: {report_path}[/green]")
+            self._write_log(f"Solution: {solution_name}")
         self._write_log(f"Findings: {len(self._findings)}")
 
-        self.sub_title = f"{self._report.solution_name} - {len(self._findings)} Findings"
+        self.sub_title = f"{solution_name} - {len(self._findings)} Findings"
+
+    def _apply_whitelist(self) -> int:
+        """Entfernt Findings die in der whitelist.json stehen.
+
+        Sucht die whitelist.json im Arbeitsverzeichnis und neben der Report-Datei.
+        Matcht auf type_id (exakt) und message (Wildcard mit fnmatch).
+
+        Returns:
+            Anzahl der entfernten Findings.
+        """
+        whitelist_path = self._find_whitelist()
+        if whitelist_path is None:
+            return 0
+
+        try:
+            data = json.loads(whitelist_path.read_text(encoding="utf-8"))
+            rules = data.get("rules", [])
+        except Exception:
+            return 0
+
+        if not rules:
+            return 0
+
+        before = len(self._findings)
+        filtered: list[Finding] = []
+        for f in self._findings:
+            skip = False
+            for rule in rules:
+                rule_type = rule.get("type_id", "")
+                rule_msg = rule.get("message", "")
+                if rule_type and f.type_id != rule_type:
+                    continue
+                if rule_msg and not fnmatch(f.message, f"*{rule_msg}*"):
+                    continue
+                skip = True
+                break
+            if not skip:
+                filtered.append(f)
+
+        self._findings = filtered
+        return before - len(filtered)
+
+    def _find_whitelist(self) -> Path | None:
+        """Sucht whitelist.json im CWD, neben der Report-Datei und neben der App."""
+        candidates = [
+            Path.cwd() / "whitelist.json",
+            Path(__file__).resolve().parent.parent.parent / "whitelist.json",
+        ]
+        if self._report:
+            candidates.append(self._report.report_path.parent / "whitelist.json")
+        for p in candidates:
+            if p.is_file():
+                return p
+        return None
 
     @work(exclusive=True)
     async def action_run_scan(self) -> None:
@@ -516,6 +592,86 @@ class InspectCodeApp(App):
         text = "\n".join(lines)
         self.copy_to_clipboard(text)
         self.notify(f"Tabelle kopiert ({len(self._findings)} Findings)")
+
+    def action_toggle_whitelist(self) -> None:
+        """Schaltet die Whitelist an/aus und aktualisiert die Findings."""
+        import dataclasses
+
+        self._whitelist_active = not self._whitelist_active
+
+        if self._whitelist_active:
+            # Whitelist anwenden: von allen Findings neu filtern
+            self._findings = list(self._all_findings)
+            count = self._apply_whitelist()
+            self._write_log(f"[green]Whitelist AN[/green] ({count} Findings ignoriert)")
+        else:
+            # Whitelist aus: alle Findings zeigen
+            self._findings = list(self._all_findings)
+            self._write_log("[yellow]Whitelist AUS[/yellow]")
+
+        # Binding-Label aktualisieren
+        label = "Whitelist AN" if self._whitelist_active else "Whitelist AUS"
+        bindings_list = self._bindings.key_to_bindings.get("w", [])
+        for i, binding in enumerate(bindings_list):
+            if binding.action == "toggle_whitelist":
+                self._bindings.key_to_bindings["w"][i] = dataclasses.replace(
+                    binding, description=label
+                )
+                break
+        self.refresh_bindings()
+
+        self._refresh_findings_ui()
+
+    def action_add_to_whitelist(self) -> None:
+        """Fuegt das aktuell markierte Finding zur Whitelist hinzu."""
+        finding = self._current_finding
+        if not finding:
+            self.notify("Kein Finding ausgewaehlt!", severity="warning")
+            return
+
+        whitelist_path = self._find_whitelist()
+        if whitelist_path is None:
+            # Neue whitelist.json im CWD erstellen
+            whitelist_path = Path.cwd() / "whitelist.json"
+
+        # Bestehende Whitelist laden oder neue erstellen
+        if whitelist_path.is_file():
+            try:
+                data = json.loads(whitelist_path.read_text(encoding="utf-8"))
+            except Exception:
+                data = {"description": "Whitelist", "rules": []}
+        else:
+            data = {"description": "Whitelist", "rules": []}
+
+        rules = data.get("rules", [])
+
+        # Pruefen ob Regel schon existiert
+        new_rule = {"type_id": finding.type_id}
+        for rule in rules:
+            if rule.get("type_id") == finding.type_id and not rule.get("message"):
+                self.notify(f"'{finding.type_id}' ist bereits in der Whitelist")
+                return
+
+        rules.append(new_rule)
+        data["rules"] = rules
+
+        # Speichern
+        whitelist_path.write_text(
+            json.dumps(data, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+
+        self._write_log(
+            f"[green]Whitelist: '{finding.type_id}' hinzugefuegt → {whitelist_path}[/green]"
+        )
+        self.notify(f"'{finding.type_id}' zur Whitelist hinzugefuegt")
+
+        # Whitelist sofort neu anwenden
+        if self._whitelist_active and self._all_findings:
+            self._findings = list(self._all_findings)
+            count = self._apply_whitelist()
+            self._write_log(f"[dim]Whitelist: {count} Findings ignoriert[/dim]")
+            self._refresh_findings_ui()
 
     def action_open_wiki(self) -> None:
         """Oeffnet die JetBrains Wiki-Seite zum aktuellen Finding im Browser."""

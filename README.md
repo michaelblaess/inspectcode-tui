@@ -1,12 +1,23 @@
 # InspectCode TUI
 
-Terminal-UI zum Durchsuchen und Beheben von [JetBrains InspectCode](https://www.jetbrains.com/help/resharper/InspectCode.html)-Ergebnissen.
+Terminal-UI zum Durchsuchen und Beheben von C# und .NET-Problemen mit [InspectCode](https://www.jetbrains.com/help/resharper/InspectCode.html) von JetBrains.
 
-A terminal user interface for browsing and fixing [JetBrains InspectCode](https://www.jetbrains.com/help/resharper/InspectCode.html) results.
+A terminal user interface for browsing and fixing C# and .NET issues with [InspectCode](https://www.jetbrains.com/help/resharper/InspectCode.html) by JetBrains.
 
 Gebaut mit / Built with [Textual](https://textual.textualize.io/) and [Rich](https://rich.readthedocs.io/).
 
-![inspectcode-tui screenshot](docs/screenshot.png)
+![inspectcode-tui Hauptansicht](docs/screenshots/01-main.png)
+*Findings-Tabelle, Quellcode mit Syntax-Highlighting, Log*
+
+| | |
+|---|---|
+| ![Top 10 Chart](docs/screenshots/02-top-10.png) | ![Fix-Dialog](docs/screenshots/03-fix-code.png) |
+| *Top 10 — Finding-Typen, Kategorien, Dateien* | *Auto-Fix mit Diff-Vorschau* |
+
+| | |
+|---|---|
+| ![Atari ST Theme](docs/screenshots/04-atari-st-theme.png) | ![IBM Terminal Theme](docs/screenshots/05-ibm-theme.png) |
+| *Atari ST GEM Theme* | *IBM Terminal — Phosphor-Gruen* |
 
 ---
 
@@ -44,6 +55,7 @@ Das Problem: InspectCode produziert einen rohen Report (XML oder SARIF/JSON) mit
 - **History** - letzte Scan-Parameter merken und wiederverwenden
 - **Top 10 Chart** - häufigste Finding-Typen, Kategorien und Dateien auf einen Blick
 - **Retro-Themes** - C64, Amiga, Atari ST und weitere via Theme-Picker (Ctrl+P)
+- **Whitelist** - bekannte Issues per `whitelist.json` ignorieren, Ein/Aus-Toggle und Hinzufügen direkt in der TUI
 - **Settings-Persistenz** - Theme, Log-Höhe und Sichtbarkeit werden gespeichert
 - **.sln und .csproj** - beide Projekttypen werden unterstützt
 - **XML und SARIF/JSON** - beide InspectCode-Ausgabeformate werden automatisch erkannt
@@ -115,7 +127,9 @@ inspectcode-tui
 | `s`       | Scan starten                            |
 | `f`       | Fix anwenden (nur bei fixbaren Issues)  |
 | `d`       | Diff-Vorschau (nur bei fixbaren Issues) |
-| `w`       | JetBrains Wiki-Seite öffnen            |
+| `w`       | Whitelist AN/AUS                        |
+| `a`       | Finding zur Whitelist hinzufügen        |
+| `j`       | JetBrains Wiki-Seite öffnen            |
 | `h`       | History-Dialog                          |
 | `o`       | Top-10-Chart                            |
 | `r`       | Aktuelle Zeile kopieren                 |
@@ -188,6 +202,7 @@ The problem: InspectCode produces a raw report (XML or SARIF/JSON) with hundreds
 - **History** - remember and reuse recent scan parameters
 - **Top 10 chart** - most frequent finding types, categories, and files at a glance
 - **Retro themes** - C64, Amiga, Atari ST and more via theme picker (Ctrl+P)
+- **Whitelist** - ignore known issues via `whitelist.json`, toggle on/off and add findings directly in the TUI
 - **Persistent settings** - theme, log height and visibility are saved
 - **.sln and .csproj** - both project types are supported
 - **XML and SARIF/JSON** - both InspectCode output formats are auto-detected
@@ -259,7 +274,9 @@ inspectcode-tui
 | `s`       | Start scan                                |
 | `f`       | Apply fix (only for fixable issues)       |
 | `d`       | Diff preview (only for fixable issues)    |
-| `w`       | Open JetBrains wiki page                  |
+| `w`       | Whitelist ON/OFF                          |
+| `a`       | Add finding to whitelist                  |
+| `j`       | Open JetBrains wiki page                  |
 | `h`       | History dialog                            |
 | `o`       | Top 10 chart                              |
 | `r`       | Copy current row                          |

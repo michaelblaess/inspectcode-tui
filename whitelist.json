@@ -1,0 +1,8 @@
+{
+  "description": "Known Issues - diese Findings werden ignoriert (type_id + optionales message Pattern)",
+  "rules": [
+    {
+      "type_id": "InvalidXmlDocComment"
+    }
+  ]
+}

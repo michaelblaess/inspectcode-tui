@@ -1,13 +1,7 @@
 @echo off
-setlocal
-
-set PYTHONPATH=%~dp0src
-
-where python >nul 2>nul
-if %errorlevel% equ 0 (
-    python -m inspectcode_tui %*
+set VENV_PYTHON=%~dp0.venv\Scripts\python.exe
+if exist "%VENV_PYTHON%" (
+    "%VENV_PYTHON%" -m inspectcode_tui %*
 ) else (
-    echo Python nicht gefunden! Bitte Python 3.10+ installieren und zum PATH hinzufuegen.
-    echo   winget install Python.Python.3.12
-    pause
+    python -m inspectcode_tui %*
 )
