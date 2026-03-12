@@ -1,5 +1,5 @@
 """InspectCode TUI - Terminal UI for JetBrains InspectCode results."""
 
-__version__ = "2.1.0"
+__version__ = "2.2.0"
 __author__ = "Michael Blaess"
 __year__ = "2026"
