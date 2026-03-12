@@ -11,6 +11,7 @@ from textual.screen import ModalScreen
 from textual.widgets import Static
 from rich.text import Text
 
+from ..i18n import t
 from ..models.finding import Finding
 
 
@@ -55,20 +56,31 @@ class TopFindingsScreen(ModalScreen):
     """
 
     BINDINGS = [
-        Binding("escape", "close", "Schliessen"),
-        Binding("q", "close", "Schliessen"),
+        Binding("escape", "close", "placeholder"),
+        Binding("q", "close", "placeholder"),
     ]
 
     def __init__(self, findings: list[Finding], **kwargs) -> None:
         super().__init__(**kwargs)
         self._findings = findings
+        self._init_bindings()
+
+    def _init_bindings(self) -> None:
+        """Ersetzt die Platzhalter-Labels der Bindings."""
+        import dataclasses
+        for key, bindings_list in self._bindings.key_to_bindings.items():
+            for i, binding in enumerate(bindings_list):
+                if binding.action == "close":
+                    self._bindings.key_to_bindings[key][i] = dataclasses.replace(
+                        binding, description=t("binding.close")
+                    )
 
     def compose(self) -> ComposeResult:
         """Erstellt das Modal-Layout."""
         with VerticalScroll():
-            yield Static("Top 10 Findings", id="top-title")
+            yield Static(t("top.title"), id="top-title")
             yield Static(self._build_chart(), id="top-content")
-            yield Static("ESC / q = Schliessen", id="top-footer")
+            yield Static(t("top.footer"), id="top-footer")
 
     def _build_chart(self) -> Text:
         """Erstellt das Balkendiagramm der Top-10-Findings.
@@ -79,11 +91,11 @@ class TopFindingsScreen(ModalScreen):
         text = Text()
 
         if not self._findings:
-            text.append("Keine Findings vorhanden.", style="green bold")
+            text.append(t("top.no_findings"), style="green bold")
             return text
 
         total = len(self._findings)
-        text.append(f"Gesamt: {total} Findings\n", style="bold")
+        text.append(t("top.total", count=total) + "\n", style="bold")
         text.append("\n")
 
         # === Top 10 Finding-Typen ===
@@ -92,15 +104,15 @@ class TopFindingsScreen(ModalScreen):
             type_counter[finding.type_id] += 1
 
         if type_counter:
-            _append_section(text, "Top 10 Finding-Typen", type_counter, "red")
+            _append_section(text, t("top.types"), type_counter, "red")
 
         # === Top 10 Kategorien ===
         category_counter: Counter = Counter()
         for finding in self._findings:
-            category_counter[finding.category or "(ohne Kategorie)"] += 1
+            category_counter[finding.category or t("top.no_category")] += 1
 
         if category_counter:
-            _append_section(text, "Top 10 Kategorien", category_counter, "yellow")
+            _append_section(text, t("top.categories"), category_counter, "yellow")
 
         # === Top 10 Dateien ===
         file_counter: Counter = Counter()
@@ -108,7 +120,7 @@ class TopFindingsScreen(ModalScreen):
             file_counter[finding.file] += 1
 
         if file_counter:
-            _append_section(text, "Top 10 Dateien", file_counter, "cyan")
+            _append_section(text, t("top.files"), file_counter, "cyan")
 
         return text
 

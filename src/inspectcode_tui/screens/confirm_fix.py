@@ -10,6 +10,7 @@ from textual.containers import Grid, Vertical
 from textual.screen import ModalScreen
 from textual.widgets import Button, Label, RichLog, Static
 
+from ..i18n import t
 from ..models.finding import Finding
 from ..services.fixer import FixResult
 
@@ -72,7 +73,7 @@ class ConfirmFixScreen(ModalScreen[FixDecision]):
     """
 
     BINDINGS = [
-        ("escape", "cancel", "Abbrechen"),
+        ("escape", "cancel", "placeholder"),
     ]
 
     def __init__(self, finding: Finding, preview: FixResult) -> None:
@@ -82,13 +83,13 @@ class ConfirmFixScreen(ModalScreen[FixDecision]):
 
     def compose(self) -> ComposeResult:
         with Vertical(id="fix-dialog"):
-            yield Static("Fix anwenden", id="fix-title")
+            yield Static(t("confirm_fix.title"), id="fix-title")
             yield Static(self._build_info(), id="fix-info")
             yield RichLog(id="fix-preview", highlight=True)
             from textual.containers import Horizontal
             with Horizontal(id="fix-buttons"):
-                yield Button("Fix Issue", variant="success", id="btn-fix")
-                yield Button("Abbrechen", variant="error", id="btn-cancel")
+                yield Button(t("confirm_fix.button_fix"), variant="success", id="btn-fix")
+                yield Button(t("confirm_fix.button_cancel"), variant="error", id="btn-cancel")
 
     def on_mount(self) -> None:
         """Zeigt die Vorschau beim Laden."""
@@ -101,8 +102,8 @@ class ConfirmFixScreen(ModalScreen[FixDecision]):
 
             diff = difflib.unified_diff(
                 old_lines, new_lines,
-                fromfile="vorher",
-                tofile="nachher",
+                fromfile=t("confirm_fix.before"),
+                tofile=t("confirm_fix.after"),
                 lineterm="",
                 n=3,
             )
@@ -111,17 +112,17 @@ class ConfirmFixScreen(ModalScreen[FixDecision]):
                 syntax = Syntax(diff_text, "diff", theme="monokai", line_numbers=False)
                 preview_log.write(syntax)
             else:
-                preview_log.write("Keine Aenderungen in der Vorschau.")
+                preview_log.write(t("confirm_fix.no_changes"))
         else:
-            preview_log.write("Keine Vorschau verfuegbar.")
+            preview_log.write(t("confirm_fix.no_preview"))
 
     def _build_info(self) -> str:
         """Erstellt den Info-Text fuer den Dialog."""
         f = self.finding
         return (
             f"[bold]{f.type_id}[/bold]\n"
-            f"Datei: {f.file}:{f.line}\n"
-            f"Nachricht: {f.message}"
+            f"{t('confirm_fix.file', file=f.file, line=f.line)}\n"
+            f"{t('confirm_fix.message', message=f.message)}"
         )
 
     def on_button_pressed(self, event: Button.Pressed) -> None:

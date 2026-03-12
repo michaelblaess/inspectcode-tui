@@ -5,54 +5,78 @@ from __future__ import annotations
 import argparse
 import sys
 
-from .app import InspectCodeApp
+from .i18n import load_locale, t
+from .models.settings import Settings
 
 
 def main() -> None:
     """Haupteinstiegspunkt fuer die CLI."""
+    # Sprache VOR argparse laden, damit auch die Hilfe-Texte uebersetzt sind
+    settings = Settings.load()
+    lang = settings.language
+    for i, arg in enumerate(sys.argv[1:]):
+        if arg == "--lang" and i + 1 < len(sys.argv[1:]):
+            lang = sys.argv[i + 2]
+            break
+        if arg.startswith("--lang="):
+            lang = arg.split("=", 1)[1]
+            break
+    load_locale(lang)
+
+    # Sprache in Settings persistieren
+    if lang != settings.language:
+        settings.language = lang
+        settings.save()
+
     parser = argparse.ArgumentParser(
         prog="inspectcode-tui",
-        description="TUI fuer JetBrains InspectCode Ergebnisse",
+        description=t("cli.description"),
     )
 
     parser.add_argument(
         "solution",
         nargs="?",
         default="",
-        help="Pfad zur .sln- oder .csproj-Datei",
+        help=t("cli.solution_help"),
     )
     parser.add_argument(
         "--project",
         default="",
-        help="Nur bestimmtes Projekt scannen",
+        help=t("cli.project_help"),
     )
     parser.add_argument(
         "--xml",
         default="",
-        help="Vorhandene Report-Datei laden (XML oder SARIF/JSON)",
+        help=t("cli.xml_help"),
     )
     parser.add_argument(
         "--severity",
         default="WARNING",
         choices=["HINT", "SUGGESTION", "WARNING", "ERROR"],
-        help="Minimale Severity (default: WARNING)",
+        help=t("cli.severity_help"),
     )
     parser.add_argument(
         "--no-build",
         action="store_true",
         default=True,
-        help="Solution nicht bauen (default: true)",
+        help=t("cli.no_build_help"),
     )
     parser.add_argument(
         "--build",
         action="store_true",
         default=False,
-        help="Solution vor dem Scan bauen",
+        help=t("cli.build_help"),
     )
     parser.add_argument(
         "--commit",
         default="",
-        help="Git-Commit-Referenz: nur geaenderte Dateien seit diesem Commit scannen (z.B. HEAD~1, main, abc1234)",
+        help=t("cli.commit_help"),
+    )
+    parser.add_argument(
+        "--lang",
+        default=lang,
+        choices=["de", "en"],
+        help=t("cli.lang_help"),
     )
 
     args = parser.parse_args()
@@ -61,10 +85,12 @@ def main() -> None:
     if args.solution:
         lower = args.solution.lower()
         if not lower.endswith(".sln") and not lower.endswith(".csproj"):
-            print(f"Fehler: '{args.solution}' ist keine .sln- oder .csproj-Datei!")
+            print(t("cli.invalid_file", path=args.solution))
             sys.exit(1)
 
     no_build = not args.build if args.build else args.no_build
+
+    from .app import InspectCodeApp
 
     app = InspectCodeApp(
         solution_path=args.solution or "",

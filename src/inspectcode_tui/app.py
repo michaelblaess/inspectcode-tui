@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 import json
 import time
 from fnmatch import fnmatch
@@ -22,6 +23,7 @@ from textual.widgets import (
 from textual_themes import register_all
 
 from . import __version__, __year__
+from .i18n import t
 from .models.finding import Finding
 from .models.history import History, HistoryEntry
 from .models.report import Report
@@ -51,25 +53,25 @@ class InspectCodeApp(App):
     TITLE = f"InspectCode TUI v{__version__} ({__year__})"
 
     BINDINGS = [
-        Binding("q", "quit", "Beenden"),
-        Binding("s", "run_scan", "Scan"),
-        Binding("f", "fix_selected", "Fix"),
-        Binding("d", "show_diff", "Diff"),
-        Binding("h", "show_history", "History"),
-        Binding("t", "copy_table", "Tabelle kopieren"),
-        Binding("o", "show_top_findings", "Top 10"),
-        Binding("l", "toggle_log", "Log"),
-        Binding("plus", "log_bigger", "Log +", key_display="+"),
-        Binding("minus", "log_smaller", "Log -", key_display="-"),
-        Binding("slash", "focus_filter", "Filter", key_display="/"),
-        Binding("escape", "clear_filter", "Filter leeren", show=False),
-        Binding("r", "copy_row", "Row kopieren"),
-        Binding("w", "toggle_whitelist", "Whitelist AN"),
-        Binding("a", "add_to_whitelist", "Whitelisten"),
-        Binding("j", "open_wiki", "JetBrains Wiki"),
-        Binding("c", "copy_log", "Log kopieren"),
-        Binding("x", "clear_log", "Log leeren"),
-        Binding("i", "show_about", "Info"),
+        Binding("q", "quit", "placeholder"),
+        Binding("s", "run_scan", "placeholder"),
+        Binding("f", "fix_selected", "placeholder"),
+        Binding("d", "show_diff", "placeholder"),
+        Binding("h", "show_history", "placeholder"),
+        Binding("t", "copy_table", "placeholder"),
+        Binding("o", "show_top_findings", "placeholder"),
+        Binding("l", "toggle_log", "placeholder"),
+        Binding("plus", "log_bigger", "placeholder", key_display="+"),
+        Binding("minus", "log_smaller", "placeholder", key_display="-"),
+        Binding("slash", "focus_filter", "placeholder", key_display="/"),
+        Binding("escape", "clear_filter", "placeholder", show=False),
+        Binding("r", "copy_row", "placeholder"),
+        Binding("w", "toggle_whitelist", "placeholder"),
+        Binding("a", "add_to_whitelist", "placeholder"),
+        Binding("j", "open_wiki", "placeholder"),
+        Binding("c", "copy_log", "placeholder"),
+        Binding("x", "clear_log", "placeholder"),
+        Binding("i", "show_about", "placeholder"),
     ]
 
     def __init__(
@@ -110,6 +112,39 @@ class InspectCodeApp(App):
         # Theme aus Settings uebernehmen
         self.theme = self._settings.theme
 
+        # Binding-Labels uebersetzen
+        self._init_bindings()
+
+    def _init_bindings(self) -> None:
+        """Ersetzt die Platzhalter-Labels der Bindings durch uebersetzte Texte."""
+        binding_labels = {
+            "quit": t("binding.quit"),
+            "run_scan": t("binding.scan"),
+            "fix_selected": t("binding.fix"),
+            "show_diff": t("binding.diff"),
+            "show_history": t("binding.history"),
+            "copy_table": t("binding.copy_table"),
+            "show_top_findings": t("binding.top_10"),
+            "toggle_log": t("binding.log"),
+            "log_bigger": t("binding.log_bigger"),
+            "log_smaller": t("binding.log_smaller"),
+            "focus_filter": t("binding.filter"),
+            "clear_filter": t("binding.clear_filter"),
+            "copy_row": t("binding.copy_row"),
+            "toggle_whitelist": t("binding.whitelist_on"),
+            "add_to_whitelist": t("binding.add_whitelist"),
+            "open_wiki": t("binding.wiki"),
+            "copy_log": t("binding.copy_log"),
+            "clear_log": t("binding.clear_log"),
+            "show_about": t("binding.info"),
+        }
+        for key, bindings_list in self._bindings.key_to_bindings.items():
+            for i, binding in enumerate(bindings_list):
+                if binding.action in binding_labels:
+                    self._bindings.key_to_bindings[key][i] = dataclasses.replace(
+                        binding, description=binding_labels[binding.action]
+                    )
+
     def compose(self) -> ComposeResult:
         """Erstellt das UI-Layout (Horizontal-Split)."""
         yield Header()
@@ -121,7 +156,7 @@ class InspectCodeApp(App):
                 yield RichLog(id="scan-log", highlight=True, markup=True)
 
             with Vertical(id="right-panel"):
-                yield Static("Keine Datei geladen", id="code-file-label")
+                yield Static(t("app.no_file_loaded"), id="code-file-label")
                 yield CodeView(id="code-display")
 
         yield Footer()
@@ -141,11 +176,11 @@ class InspectCodeApp(App):
         if self.xml_path:
             self._load_report(self.xml_path)
         elif self.solution_path:
-            self._write_log(f"Solution: {self.solution_path}")
-            self._write_log("[dim]Druecke [bold]s[/bold] um den Scan zu starten.[/dim]")
+            self._write_log(t("app.solution_label", name=self.solution_path))
+            self._write_log(t("app.press_s"))
         else:
-            self._write_log("[dim]Keine Solution angegeben.[/dim]")
-            self._write_log("[dim]Druecke [bold]h[/bold] fuer History oder starte mit einer .sln/.csproj-Datei.[/dim]")
+            self._write_log(t("app.no_solution"))
+            self._write_log(t("app.press_h"))
 
     def _load_report(self, report_path: str) -> None:
         """Laedt eine vorhandene Report-Datei (XML oder SARIF/JSON).
@@ -157,8 +192,8 @@ class InspectCodeApp(App):
             self._report = Report(report_path)
             self._findings = self._report.parse()
         except Exception as e:
-            self._write_log(f"[red]Fehler beim Laden: {e}[/red]")
-            self.notify(f"Fehler: {e}", severity="error")
+            self._write_log(t("app.load_error", error=e))
+            self.notify(t("app.load_error_notify", error=e), severity="error")
             return
 
         # Solution-Dir ermitteln fuer Fixer
@@ -177,8 +212,10 @@ class InspectCodeApp(App):
             before_count = len(self._findings)
             self._findings = self._report.filter_by_files(self._git_changed_files)
             self._write_log(
-                f"Git-Filter: {len(self._findings)} von {before_count} Findings "
-                f"in {len(self._git_changed_files)} geaenderten Dateien"
+                t("app.git_filter",
+                  found=len(self._findings),
+                  total=before_count,
+                  files=len(self._git_changed_files))
             )
 
         # Alle Findings (vor Whitelist) merken
@@ -189,7 +226,7 @@ class InspectCodeApp(App):
             whitelist_count = self._apply_whitelist()
             if whitelist_count > 0:
                 self._write_log(
-                    f"[dim]Whitelist: {whitelist_count} Findings ignoriert[/dim]"
+                    t("app.whitelist_ignored", count=whitelist_count)
                 )
 
         self._refresh_findings_ui(report_path)
@@ -204,11 +241,11 @@ class InspectCodeApp(App):
         summary.update_findings(self._findings, solution_name)
 
         if report_path:
-            self._write_log(f"[green]Geladen: {report_path}[/green]")
-            self._write_log(f"Solution: {solution_name}")
-        self._write_log(f"Findings: {len(self._findings)}")
+            self._write_log(t("app.loaded", path=report_path))
+            self._write_log(t("app.solution_label", name=solution_name))
+        self._write_log(t("app.findings_count", count=len(self._findings)))
 
-        self.sub_title = f"{solution_name} - {len(self._findings)} Findings"
+        self.sub_title = t("app.subtitle_findings", name=solution_name, count=len(self._findings))
 
     def _apply_whitelist(self) -> int:
         """Entfernt Findings die in der whitelist.json stehen.
@@ -268,7 +305,7 @@ class InspectCodeApp(App):
     async def action_run_scan(self) -> None:
         """Startet einen neuen InspectCode-Scan."""
         if not self.solution_path:
-            self.notify("Kein Solution-Pfad angegeben!", severity="error")
+            self.notify(t("app.no_solution_path"), severity="error")
             return
 
         self._scan_running = True
@@ -279,7 +316,7 @@ class InspectCodeApp(App):
         log.remove_class("hidden")
         log.clear()
         self._log_lines.clear()
-        self._write_log("[bold]Scan wird gestartet...[/bold]")
+        self._write_log(t("app.scan_starting"))
 
         # Progress-Timer starten
         self._scan_progress_timer = self.set_interval(0.5, self._tick_scan_progress)
@@ -288,13 +325,13 @@ class InspectCodeApp(App):
         include_files: list[str] = []
         if self.commit:
             sol_dir = Path(self.solution_path).parent
-            self._write_log(f"[bold]Git-Modus: diff seit {self.commit}[/bold]")
+            self._write_log(t("app.git_mode", commit=self.commit))
             self._git_changed_files = await get_git_changed_files(
                 sol_dir, self.commit, on_output=self._write_log,
             )
             if not self._git_changed_files:
-                self._write_log("[yellow]Keine geaenderten .cs-Dateien gefunden.[/yellow]")
-                self.notify("Keine geaenderten .cs-Dateien!", severity="warning")
+                self._write_log(t("app.no_cs_files"))
+                self.notify(t("app.no_cs_files_notify"), severity="warning")
                 self._stop_scan()
                 return
             include_files = list(self._git_changed_files)
@@ -318,7 +355,7 @@ class InspectCodeApp(App):
                 commit=self.commit,
             )
             History.add(history_entry)
-            self._write_log("[dim]History aktualisiert[/dim]")
+            self._write_log(t("app.history_updated"))
         except Exception:
             pass
 
@@ -332,7 +369,7 @@ class InspectCodeApp(App):
         if return_code == 0:
             self._load_report(xml_path)
         else:
-            self.notify(f"Scan fehlgeschlagen (Exit-Code: {return_code})", severity="error")
+            self.notify(t("app.scan_failed", code=return_code), severity="error")
 
     def _stop_scan(self) -> None:
         """Stoppt den Scan und den Progress-Timer."""
@@ -344,7 +381,7 @@ class InspectCodeApp(App):
         # Dauer anzeigen
         if self._scan_start_time > 0:
             duration_ms = int((time.monotonic() - self._scan_start_time) * 1000)
-            self.sub_title = f"Scan abgeschlossen in {_format_duration(duration_ms)}"
+            self.sub_title = t("app.scan_completed", duration=_format_duration(duration_ms))
             self._scan_start_time = 0
 
         self.refresh_bindings()
@@ -354,7 +391,7 @@ class InspectCodeApp(App):
         elapsed = time.monotonic() - self._scan_start_time
         bar = _format_progress_bar(elapsed)
         duration = _format_duration(int(elapsed * 1000))
-        self.sub_title = f"Scanning {bar} {duration}"
+        self.sub_title = t("app.scanning", bar=bar, duration=duration)
 
     def on_findings_table_finding_selected(
         self, event: FindingsTable.FindingSelected
@@ -395,22 +432,22 @@ class InspectCodeApp(App):
         if loaded:
             label.update(f" {finding.file}:{finding.line}\n {finding.type_id}: {finding.message}")
         else:
-            label.update(f" Datei nicht gefunden: {file_path}")
+            label.update(t("app.file_not_found", path=file_path))
 
     def action_fix_selected(self) -> None:
         """Wendet einen Fix auf das ausgewaehlte Finding an."""
         finding = self._current_finding
         if not finding:
-            self.notify("Kein Finding ausgewaehlt!", severity="warning")
+            self.notify(t("app.no_finding"), severity="warning")
             return
 
         if not self._fixer:
-            self.notify("Kein Fixer konfiguriert!", severity="error")
+            self.notify(t("app.no_fixer"), severity="error")
             return
 
         if not self._fixer.can_fix(finding):
             self.notify(
-                f"Kein automatischer Fix fuer '{finding.type_id}' verfuegbar.",
+                t("app.no_fix_available", type_id=finding.type_id),
                 severity="warning",
             )
             return
@@ -432,7 +469,7 @@ class InspectCodeApp(App):
             decision: Entscheidung des Benutzers.
         """
         if not decision.confirmed:
-            self.notify("Fix abgebrochen.")
+            self.notify(t("app.fix_cancelled"))
             return
 
         finding = self._current_finding
@@ -455,16 +492,16 @@ class InspectCodeApp(App):
         """Zeigt einen Diff fuer das ausgewaehlte Finding."""
         finding = self._current_finding
         if not finding:
-            self.notify("Kein Finding ausgewaehlt!", severity="warning")
+            self.notify(t("app.no_finding"), severity="warning")
             return
 
         if not self._fixer:
-            self.notify("Kein Fixer konfiguriert!", severity="error")
+            self.notify(t("app.no_fixer"), severity="error")
             return
 
         preview = self._fixer.preview_fix(finding)
         if not preview.success or not preview.old_content:
-            self.notify("Keine Diff-Vorschau verfuegbar.", severity="warning")
+            self.notify(t("app.no_diff"), severity="warning")
             return
 
         self.push_screen(
@@ -499,8 +536,8 @@ class InspectCodeApp(App):
         self.no_build = entry.no_build
         self.commit = entry.commit
 
-        self._write_log("[bold]History: Parameter uebernommen[/bold]")
-        self._write_log(f"Solution: {self.solution_path}")
+        self._write_log(t("app.history_loaded"))
+        self._write_log(t("app.solution_label", name=self.solution_path))
         params = [f"--severity {self.severity}"]
         if self.project:
             params.append(f"--project {self.project}")
@@ -509,12 +546,12 @@ class InspectCodeApp(App):
         if self.commit:
             params.append(f"--commit {self.commit}")
         self._write_log(f"Parameter: {' '.join(params)}")
-        self._write_log("[dim]Scan mit 's' starten[/dim]")
+        self._write_log(t("app.start_scan_s"))
 
     def action_show_top_findings(self) -> None:
         """Zeigt den Top-10-Findings Dialog."""
         if not self._findings:
-            self.notify("Keine Findings vorhanden!", severity="warning")
+            self.notify(t("app.no_findings"), severity="warning")
             return
 
         from .screens.top_findings import TopFindingsScreen
@@ -569,20 +606,20 @@ class InspectCodeApp(App):
         """Kopiert das aktuelle Finding als Text in die Zwischenablage."""
         finding = self._current_finding
         if not finding:
-            self.notify("Kein Finding ausgewaehlt!", severity="warning")
+            self.notify(t("app.no_finding"), severity="warning")
             return
 
         text = f"{finding.file}:{finding.line}\t{finding.severity}\t{finding.type_id}\t{finding.message}"
         self.copy_to_clipboard(text)
-        self.notify(f"Row kopiert: {finding.filename}:{finding.line}")
+        self.notify(t("app.row_copied", file=finding.filename, line=finding.line))
 
     def action_copy_table(self) -> None:
         """Kopiert die gesamte Findings-Tabelle als Tab-getrennten Text in die Zwischenablage."""
         if not self._findings:
-            self.notify("Keine Findings vorhanden!", severity="warning")
+            self.notify(t("app.no_findings"), severity="warning")
             return
 
-        lines = ["Datei\tZeile\tSeverity\tKategorie\tTyp\tNachricht"]
+        lines = [t("app.table_header")]
         for finding in self._findings:
             lines.append(
                 f"{finding.file}\t{finding.line}\t{finding.severity}\t"
@@ -591,26 +628,24 @@ class InspectCodeApp(App):
 
         text = "\n".join(lines)
         self.copy_to_clipboard(text)
-        self.notify(f"Tabelle kopiert ({len(self._findings)} Findings)")
+        self.notify(t("app.table_copied", count=len(self._findings)))
 
     def action_toggle_whitelist(self) -> None:
         """Schaltet die Whitelist an/aus und aktualisiert die Findings."""
-        import dataclasses
-
         self._whitelist_active = not self._whitelist_active
 
         if self._whitelist_active:
             # Whitelist anwenden: von allen Findings neu filtern
             self._findings = list(self._all_findings)
             count = self._apply_whitelist()
-            self._write_log(f"[green]Whitelist AN[/green] ({count} Findings ignoriert)")
+            self._write_log(t("app.whitelist_on_log", count=count))
         else:
             # Whitelist aus: alle Findings zeigen
             self._findings = list(self._all_findings)
-            self._write_log("[yellow]Whitelist AUS[/yellow]")
+            self._write_log(t("app.whitelist_off_log"))
 
         # Binding-Label aktualisieren
-        label = "Whitelist AN" if self._whitelist_active else "Whitelist AUS"
+        label = t("binding.whitelist_on") if self._whitelist_active else t("binding.whitelist_off")
         bindings_list = self._bindings.key_to_bindings.get("w", [])
         for i, binding in enumerate(bindings_list):
             if binding.action == "toggle_whitelist":
@@ -626,7 +661,7 @@ class InspectCodeApp(App):
         """Fuegt das aktuell markierte Finding zur Whitelist hinzu."""
         finding = self._current_finding
         if not finding:
-            self.notify("Kein Finding ausgewaehlt!", severity="warning")
+            self.notify(t("app.no_finding"), severity="warning")
             return
 
         whitelist_path = self._find_whitelist()
@@ -649,7 +684,7 @@ class InspectCodeApp(App):
         new_rule = {"type_id": finding.type_id}
         for rule in rules:
             if rule.get("type_id") == finding.type_id and not rule.get("message"):
-                self.notify(f"'{finding.type_id}' ist bereits in der Whitelist")
+                self.notify(t("app.whitelist_exists", type_id=finding.type_id))
                 return
 
         rules.append(new_rule)
@@ -662,15 +697,15 @@ class InspectCodeApp(App):
         )
 
         self._write_log(
-            f"[green]Whitelist: '{finding.type_id}' hinzugefuegt → {whitelist_path}[/green]"
+            t("app.whitelist_added_log", type_id=finding.type_id, path=whitelist_path)
         )
-        self.notify(f"'{finding.type_id}' zur Whitelist hinzugefuegt")
+        self.notify(t("app.whitelist_added", type_id=finding.type_id))
 
         # Whitelist sofort neu anwenden
         if self._whitelist_active and self._all_findings:
             self._findings = list(self._all_findings)
             count = self._apply_whitelist()
-            self._write_log(f"[dim]Whitelist: {count} Findings ignoriert[/dim]")
+            self._write_log(t("app.whitelist_ignored", count=count))
             self._refresh_findings_ui()
 
     def action_open_wiki(self) -> None:
@@ -679,7 +714,7 @@ class InspectCodeApp(App):
 
         finding = self._current_finding
         if not finding:
-            self.notify("Kein Finding ausgewaehlt!", severity="warning")
+            self.notify(t("app.no_finding"), severity="warning")
             return
 
         if finding.wiki_url:
@@ -689,22 +724,22 @@ class InspectCodeApp(App):
             url = f"https://www.jetbrains.com/help/resharper/Reference__Code_Inspections_CSHARP.html#{finding.type_id}"
 
         webbrowser.open(url)
-        self.notify(f"Wiki: {finding.type_id}")
+        self.notify(t("app.wiki_notify", type_id=finding.type_id))
 
     def action_copy_log(self) -> None:
         """Kopiert das Log in die Zwischenablage."""
         if not self._log_lines:
-            self.notify("Log ist leer.", severity="warning")
+            self.notify(t("app.log_empty"), severity="warning")
             return
         text = "\n".join(self._log_lines)
         self.copy_to_clipboard(text)
-        self.notify(f"Log kopiert ({len(self._log_lines)} Zeilen)")
+        self.notify(t("app.log_copied", count=len(self._log_lines)))
 
     def action_clear_log(self) -> None:
         """Leert das Log."""
         self._log_lines.clear()
         self.query_one("#scan-log", RichLog).clear()
-        self.notify("Log geleert.")
+        self.notify(t("app.log_cleared"))
 
     def action_show_about(self) -> None:
         """Zeigt den About-Dialog an."""

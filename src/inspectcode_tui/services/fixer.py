@@ -6,6 +6,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+from ..i18n import t
 from ..models.finding import Finding
 
 
@@ -48,20 +49,20 @@ class Fixer:
         """Zeigt eine Vorschau des Fixes an, ohne ihn anzuwenden."""
         file_path = self._resolve_path(finding.file)
         if not file_path.exists():
-            return FixResult(False, f"Datei nicht gefunden: {file_path}")
+            return FixResult(False, t("fixer.file_not_found", path=file_path))
 
         try:
             content = file_path.read_text(encoding="utf-8-sig")
         except OSError as e:
-            return FixResult(False, f"Fehler beim Lesen: {e}")
+            return FixResult(False, t("fixer.read_error", error=e))
 
         new_content = self._apply_fix_to_content(finding, content)
         if new_content == content:
-            return FixResult(False, "Keine Aenderung moeglich.")
+            return FixResult(False, t("fixer.no_change"))
 
         return FixResult(
             success=True,
-            message=f"Fix fuer {finding.type_id}",
+            message=t("fixer.preview", type_id=finding.type_id),
             old_content=content,
             new_content=new_content,
         )
@@ -77,26 +78,26 @@ class Fixer:
         """
         file_path = self._resolve_path(finding.file)
         if not file_path.exists():
-            return FixResult(False, f"Datei nicht gefunden: {file_path}")
+            return FixResult(False, t("fixer.file_not_found", path=file_path))
 
         try:
             content = file_path.read_text(encoding="utf-8-sig")
         except OSError as e:
-            return FixResult(False, f"Fehler beim Lesen: {e}")
+            return FixResult(False, t("fixer.read_error", error=e))
 
         new_content = self._apply_fix_to_content(finding, content)
         if new_content == content:
-            return FixResult(False, "Keine Aenderung moeglich.")
+            return FixResult(False, t("fixer.no_change"))
 
         # Fix anwenden
         try:
             file_path.write_text(new_content, encoding="utf-8")
         except OSError as e:
-            return FixResult(False, f"Fehler beim Schreiben: {e}")
+            return FixResult(False, t("fixer.write_error", error=e))
 
         return FixResult(
             success=True,
-            message=f"Fix angewendet: {finding.type_id} in {finding.filename}:{finding.line}",
+            message=t("fixer.applied", type_id=finding.type_id, file=finding.filename, line=finding.line),
             old_content=content,
             new_content=new_content,
         )
@@ -272,3 +273,4 @@ class Fixer:
         )
         lines[line_idx] = new_line
         return "".join(lines)
+

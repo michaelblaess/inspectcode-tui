@@ -12,6 +12,8 @@ from textual.containers import VerticalScroll
 from textual.reactive import reactive
 from textual.widgets import Static
 
+from ..i18n import t
+
 
 # Mapping von Dateiendungen zu Rich-Sprachen
 LANGUAGE_MAP = {
@@ -61,7 +63,7 @@ class CodeView(VerticalScroll, can_focus=True):
     def compose(self) -> ComposeResult:
         """Erstellt den inneren Static-Container."""
         yield Static(
-            Text("Kein Code geladen. Waehle ein Finding aus.", style="dim italic"),
+            Text(t("code.no_code"), style="dim italic"),
             id="code-content",
         )
 
@@ -78,7 +80,7 @@ class CodeView(VerticalScroll, can_focus=True):
         path = Path(file_path)
         if not path.exists():
             self._code = ""
-            self.file_path_label = f"Datei nicht gefunden: {path}"
+            self.file_path_label = t("code.file_not_found", path=path)
             self._update_content()
             return False
 
@@ -89,7 +91,7 @@ class CodeView(VerticalScroll, can_focus=True):
                 content = path.read_text(encoding="latin-1")
             except OSError:
                 self._code = ""
-                self.file_path_label = f"Fehler beim Lesen: {path}"
+                self.file_path_label = t("code.read_error", path=path)
                 self._update_content()
                 return False
 
@@ -113,7 +115,7 @@ class CodeView(VerticalScroll, can_focus=True):
 
         if not self._code:
             content_widget.update(
-                Text("Kein Code geladen. Waehle ein Finding aus.", style="dim italic")
+                Text(t("code.no_code"), style="dim italic")
             )
             return
 

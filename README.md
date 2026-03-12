@@ -57,6 +57,7 @@ Das Problem: InspectCode produziert einen rohen Report (XML oder SARIF/JSON) mit
 - **Retro-Themes** - C64, Amiga, Atari ST und weitere via Theme-Picker (Ctrl+P)
 - **Whitelist** - bekannte Issues per `whitelist.json` ignorieren, Ein/Aus-Toggle und Hinzufügen direkt in der TUI
 - **Settings-Persistenz** - Theme, Log-Höhe und Sichtbarkeit werden gespeichert
+- **Mehrsprachig** - Deutsch und Englisch, umschaltbar mit `--lang en`
 - **.sln und .csproj** - beide Projekttypen werden unterstützt
 - **XML und SARIF/JSON** - beide InspectCode-Ausgabeformate werden automatisch erkannt
 
@@ -114,11 +115,15 @@ inspectcode-tui --xml="report.xml" --severity=ERROR
 # Vor dem Scan bauen (Standard: --no-build)
 inspectcode-tui "MeineSolution.sln" --build
 
+# Englische Oberfläche
+inspectcode-tui "MeineSolution.sln" --lang en
+
 # Ohne Argumente starten (History-Auswahl)
 inspectcode-tui
 ```
 
 > **Tipp:** Schließe Visual Studio bevor du einen Live-Scan startest, um Dateisperren zu vermeiden.
+> Die gewählte Sprache wird gespeichert und beim nächsten Start automatisch verwendet.
 
 ## Tastenkürzel
 
@@ -204,6 +209,7 @@ The problem: InspectCode produces a raw report (XML or SARIF/JSON) with hundreds
 - **Retro themes** - C64, Amiga, Atari ST and more via theme picker (Ctrl+P)
 - **Whitelist** - ignore known issues via `whitelist.json`, toggle on/off and add findings directly in the TUI
 - **Persistent settings** - theme, log height and visibility are saved
+- **Multilingual** - German and English, switch with `--lang en`
 - **.sln and .csproj** - both project types are supported
 - **XML and SARIF/JSON** - both InspectCode output formats are auto-detected
 
@@ -261,11 +267,15 @@ inspectcode-tui --xml="report.xml" --severity=ERROR
 # Build before scanning (default: --no-build)
 inspectcode-tui "MySolution.sln" --build
 
+# English UI
+inspectcode-tui "MySolution.sln" --lang en
+
 # Start without arguments (history selection)
 inspectcode-tui
 ```
 
 > **Tip:** Close Visual Studio before running a live scan to avoid file lock errors.
+> The selected language is saved and automatically used on the next start.
 
 ## Keyboard Shortcuts
 
@@ -324,9 +334,13 @@ More fix strategies can be added in `src/inspectcode_tui/services/fixer.py`.
 
 ```
 src/inspectcode_tui/
-├── __main__.py              # CLI entry point (argparse)
+├── __main__.py              # CLI entry point (argparse, --lang)
 ├── app.py                   # Main Textual app (horizontal split, keybindings)
 ├── app.tcss                 # Stylesheet
+├── i18n.py                  # Internationalization (de/en)
+├── locale/
+│   ├── de.json              # German language pack
+│   └── en.json              # English language pack
 ├── models/
 │   ├── finding.py           # Finding dataclass
 │   ├── report.py            # Report parser (XML + SARIF/JSON)

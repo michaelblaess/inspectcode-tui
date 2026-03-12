@@ -29,6 +29,7 @@ class Settings:
     log_height: int = 12
     log_visible: bool = True
     no_build: bool = True
+    language: str = "de"
 
     SETTINGS_DIR = Path.home() / ".inspectcode-tui"
     SETTINGS_FILE = SETTINGS_DIR / "settings.json"
@@ -44,6 +45,7 @@ class Settings:
             "log_height": self.log_height,
             "log_visible": self.log_visible,
             "no_build": self.no_build,
+            "language": self.language,
         }
 
     @staticmethod
@@ -68,6 +70,7 @@ class Settings:
                 log_height=data.get("log_height", 12),
                 log_visible=data.get("log_visible", True),
                 no_build=data.get("no_build", True),
+                language=data.get("language", "de"),
             )
         except Exception as exc:
             logger.warning("Settings konnten nicht geladen werden: %s", exc)

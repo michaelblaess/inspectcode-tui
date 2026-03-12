@@ -6,6 +6,7 @@ import json
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+from ..i18n import t
 from .finding import Finding
 
 
@@ -39,8 +40,7 @@ class Report:
             self._parse_xml(raw)
         else:
             raise ValueError(
-                f"Unbekanntes Report-Format (erstes Zeichen: '{first_char}'). "
-                "Erwartet wird XML oder SARIF/JSON."
+                t("report.unknown_format", char=first_char)
             )
 
         return self.findings
@@ -132,7 +132,7 @@ class Report:
 
         runs = data.get("runs", [])
         if not runs:
-            raise ValueError("SARIF-Datei enthaelt keine 'runs'.")
+            raise ValueError(t("report.sarif_no_runs"))
 
         run = runs[0]
 

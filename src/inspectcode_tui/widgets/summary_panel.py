@@ -7,6 +7,7 @@ from textual.app import ComposeResult, RenderResult
 from textual.widget import Widget
 from textual.widgets import Static
 
+from ..i18n import t
 from ..models.finding import Finding
 
 
@@ -30,7 +31,7 @@ class SummaryPanel(Widget):
 
     def render(self) -> RenderResult:
         if not self._findings:
-            return Text("Keine Findings geladen.", style="dim italic")
+            return Text(t("summary.no_findings"), style="dim italic")
 
         text = Text()
 
@@ -39,7 +40,7 @@ class SummaryPanel(Widget):
             text.append("  |  ")
 
         total = len(self._findings)
-        text.append(f"{total} Findings", style="bold")
+        text.append(t("summary.findings", count=total), style="bold")
         text.append("  ")
 
         # Severity-Zaehler
@@ -78,7 +79,7 @@ class SummaryPanel(Widget):
                     text.append("  |  ")
                 text.append(f"{cat}: {count}", style="dim")
             if len(cat_parts) > 5:
-                text.append(f"  (+{len(cat_parts) - 5} weitere)", style="dim")
+                text.append(t("summary.more_categories", count=len(cat_parts) - 5), style="dim")
 
         return text
 

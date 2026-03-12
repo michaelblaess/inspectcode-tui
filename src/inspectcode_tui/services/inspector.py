@@ -8,6 +8,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable
 
+from ..i18n import t
+
 
 @dataclass
 class InspectOptions:
@@ -140,9 +142,9 @@ async def run_inspection(
     if on_output:
         on_output("")
         if return_code == 0:
-            on_output(f"Scan abgeschlossen. Ergebnis: {options.output_path}")
+            on_output(t("inspector.scan_completed", path=options.output_path))
         else:
-            on_output(f"Scan fehlgeschlagen (Exit-Code: {return_code})")
+            on_output(t("inspector.scan_failed", code=return_code))
 
     return return_code, options.output_path
 
@@ -180,7 +182,7 @@ async def get_git_changed_files(
         if process.returncode != 0:
             error_msg = stderr.decode("utf-8", errors="replace").strip()
             if on_output:
-                on_output(f"[red]git diff fehlgeschlagen: {error_msg}[/red]")
+                on_output(t("inspector.git_failed", error=error_msg))
             return []
 
         all_files = stdout.decode("utf-8", errors="replace").strip().splitlines()
@@ -190,7 +192,7 @@ async def get_git_changed_files(
         cs_files = [f for f in all_files if f.lower().endswith(cs_extensions)]
 
         if on_output:
-            on_output(f"git diff --name-only {commit}: {len(all_files)} Dateien, {len(cs_files)} C#-Dateien")
+            on_output(t("inspector.git_stats", commit=commit, total=len(all_files), cs=len(cs_files)))
             for cs_file in cs_files:
                 on_output(f"  {cs_file}")
 
@@ -198,9 +200,9 @@ async def get_git_changed_files(
 
     except FileNotFoundError:
         if on_output:
-            on_output("[red]git nicht gefunden. Ist Git installiert?[/red]")
+            on_output(t("inspector.git_not_found"))
         return []
     except Exception as exc:
         if on_output:
-            on_output(f"[red]Fehler bei git diff: {exc}[/red]")
+            on_output(t("inspector.git_error", error=exc))
         return []

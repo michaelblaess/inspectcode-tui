@@ -11,6 +11,8 @@ from textual.containers import Vertical
 from textual.screen import ModalScreen
 from textual.widgets import Button, RichLog, Static
 
+from ..i18n import t
+
 
 class DiffViewScreen(ModalScreen[bool]):
     """Modal-Dialog der einen Diff anzeigt."""
@@ -52,24 +54,24 @@ class DiffViewScreen(ModalScreen[bool]):
     """
 
     BINDINGS = [
-        ("escape", "close", "Schliessen"),
-        ("q", "close", "Schliessen"),
+        ("escape", "close", "placeholder"),
+        ("q", "close", "placeholder"),
     ]
 
     def __init__(
         self,
         old_content: str,
         new_content: str,
-        title: str = "Diff-Ansicht",
-        old_label: str = "vorher",
-        new_label: str = "nachher",
+        title: str = "",
+        old_label: str = "",
+        new_label: str = "",
     ) -> None:
         super().__init__()
         self.old_content = old_content
         self.new_content = new_content
-        self.diff_title = title
-        self.old_label = old_label
-        self.new_label = new_label
+        self.diff_title = title or t("diff.default_title")
+        self.old_label = old_label or t("diff.before")
+        self.new_label = new_label or t("diff.after")
 
     def compose(self) -> ComposeResult:
         with Vertical(id="diff-dialog"):
@@ -77,7 +79,7 @@ class DiffViewScreen(ModalScreen[bool]):
             yield RichLog(id="diff-content", highlight=True)
             from textual.containers import Horizontal
             with Horizontal(id="diff-close-bar"):
-                yield Button("Schliessen", variant="primary", id="btn-close")
+                yield Button(t("diff.close"), variant="primary", id="btn-close")
 
     def on_mount(self) -> None:
         """Zeigt den Diff beim Laden."""
@@ -99,7 +101,7 @@ class DiffViewScreen(ModalScreen[bool]):
             syntax = Syntax(diff_text, "diff", theme="monokai", line_numbers=False)
             log.write(syntax)
         else:
-            log.write(Text("Keine Unterschiede.", style="dim italic"))
+            log.write(Text(t("diff.no_differences"), style="dim italic"))
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "btn-close":

@@ -9,6 +9,7 @@ from textual.widgets import DataTable, Input, Static
 from textual.message import Message
 from rich.text import Text
 
+from ..i18n import t
 from ..models.finding import Finding
 
 
@@ -62,13 +63,20 @@ class FindingsTable(Vertical):
         self._category_filter: str = ""
 
     def compose(self) -> ComposeResult:
-        yield Input(placeholder="Filter (Datei, Nachricht, Kategorie...)", id="filter-bar")
+        yield Input(placeholder=t("table.filter_placeholder"), id="filter-bar")
         yield Static("", id="findings-count")
         yield DataTable(id="findings-data", cursor_type="row", zebra_stripes=True)
 
     def on_mount(self) -> None:
         table = self.query_one("#findings-data", DataTable)
-        table.add_columns("#", "Sev", "Datei", "Zeile", "Kategorie", "Nachricht")
+        table.add_columns(
+            t("table.col_number"),
+            t("table.col_sev"),
+            t("table.col_file"),
+            t("table.col_line"),
+            t("table.col_category"),
+            t("table.col_message"),
+        )
         table.focus()
 
     def load_findings(self, findings: list[Finding]) -> None:
@@ -119,9 +127,9 @@ class FindingsTable(Vertical):
         total = len(self._findings)
         shown = len(self._filtered)
         if total == shown:
-            count_label.update(f" {total} Findings")
+            count_label.update(t("table.count", count=total))
         else:
-            count_label.update(f" {shown} von {total} Findings (gefiltert)")
+            count_label.update(t("table.count_filtered", shown=shown, total=total))
 
     def _styled_severity(self, severity: str) -> Text:
         """Erstellt farbcodierten Severity-Text."""

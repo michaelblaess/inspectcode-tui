@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "inspectcode-tui"
-version = "2.0.0"
+version = "2.1.0"
 description = "TUI for JetBrains InspectCode results"
 requires-python = ">=3.10"
 dependencies = [
@@ -12,6 +12,9 @@ dependencies = [
     "rich>=13.0",
     "textual-themes @ git+https://github.com/michaelblaess/textual-themes.git",
 ]
+
+[tool.setuptools.package-data]
+inspectcode_tui = ["locale/*.json"]
 
 [project.scripts]
 inspectcode-tui = "inspectcode_tui.__main__:main"

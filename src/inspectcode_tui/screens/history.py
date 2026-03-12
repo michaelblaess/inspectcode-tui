@@ -14,6 +14,7 @@ from textual.containers import Vertical
 from textual.screen import ModalScreen
 from textual.widgets import DataTable, Static
 
+from ..i18n import t
 from ..models.history import History, HistoryEntry
 
 
@@ -67,31 +68,45 @@ class HistoryScreen(ModalScreen[HistoryEntry | None]):
     """
 
     BINDINGS = [
-        Binding("escape", "close", "Schliessen"),
-        Binding("q", "close", "Schliessen"),
+        Binding("escape", "close", "placeholder"),
+        Binding("q", "close", "placeholder"),
     ]
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         self._entries: list[HistoryEntry] = []
+        self._init_bindings()
+
+    def _init_bindings(self) -> None:
+        """Ersetzt die Platzhalter-Labels der Bindings."""
+        import dataclasses
+        for key, bindings_list in self._bindings.key_to_bindings.items():
+            for i, binding in enumerate(bindings_list):
+                if binding.action == "close":
+                    self._bindings.key_to_bindings[key][i] = dataclasses.replace(
+                        binding, description=t("binding.close")
+                    )
 
     def compose(self) -> ComposeResult:
         """Erstellt das Modal-Layout."""
         self._entries = History.load()
 
         with Vertical():
-            yield Static("Scan-History", id="history-title")
+            yield Static(t("history.title"), id="history-title")
 
             if not self._entries:
                 yield Static(
-                    "Noch keine Scans in der History.\n\n"
-                    "Starte einen Scan mit einer Solution-Datei,\n"
-                    "dann erscheint er hier.",
+                    t("history.empty"),
                     id="history-empty",
                 )
             else:
                 table = DataTable(id="history-table", cursor_type="row")
-                table.add_columns("#", "Datum", "Solution", "Parameter")
+                table.add_columns(
+                    t("history.col_number"),
+                    t("history.col_date"),
+                    t("history.col_solution"),
+                    t("history.col_params"),
+                )
                 for idx, entry in enumerate(self._entries, start=1):
                     # Datum kuerzen
                     date_str = entry.timestamp[:16].replace("T", " ") if entry.timestamp else "?"
@@ -115,7 +130,7 @@ class HistoryScreen(ModalScreen[HistoryEntry | None]):
 
                 yield table
 
-            yield Static("Enter = Auswaehlen  |  ESC/q = Schliessen", id="history-footer")
+            yield Static(t("history.footer"), id="history-footer")
 
     def on_mount(self) -> None:
         """Fokussiert die Tabelle nach dem Oeffnen."""
