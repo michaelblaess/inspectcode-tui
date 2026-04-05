@@ -22,6 +22,8 @@ a = Analysis(
     datas=[
         # App-eigene Dateien
         (os.path.join(src_pkg, "app.tcss"), "inspectcode_tui"),
+        # Locale JSON-Dateien (i18n)
+        (os.path.join(src_pkg, "locale"), os.path.join("inspectcode_tui", "locale")),
     ],
     hiddenimports=[
         "inspectcode_tui",
