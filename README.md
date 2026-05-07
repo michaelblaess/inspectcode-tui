@@ -16,8 +16,8 @@ Gebaut mit / Built with [Textual](https://textual.textualize.io/) and [Rich](htt
 
 | | |
 |---|---|
-| ![Atari ST Theme](docs/screenshots/04-atari-st-theme.png) | ![IBM Terminal Theme](docs/screenshots/05-ibm-theme.png) |
-| *Atari ST GEM Theme* | *IBM Terminal — Phosphor-Gruen* |
+| ![Gemstone Theme](docs/screenshots/04-atari-st-theme.png) | ![Classic Terminal Theme](docs/screenshots/05-ibm-theme.png) |
+| *Gemstone — Monochromer GEM Desktop* | *Classic Terminal — Phosphor-Gruen* |
 
 ---
 
@@ -54,7 +54,7 @@ Das Problem: InspectCode produziert einen rohen Report (XML oder SARIF/JSON) mit
 - **Auto-Fix** für 11 Issue-Typen mit Diff-Vorschau vor dem Anwenden
 - **History** - letzte Scan-Parameter merken und wiederverwenden
 - **Top 10 Chart** - häufigste Finding-Typen, Kategorien und Dateien auf einen Blick
-- **Retro-Themes** - C64, Amiga, Atari ST und weitere via Theme-Picker (Ctrl+P)
+- **31 Retro-Themes** - via Theme-Picker (Ctrl+P), siehe [textual-themes](https://github.com/michaelblaess/textual-themes)
 - **Whitelist** - bekannte Issues per `whitelist.json` ignorieren, Ein/Aus-Toggle und Hinzufügen direkt in der TUI
 - **Settings-Persistenz** - Theme, Log-Höhe und Sichtbarkeit werden gespeichert
 - **Mehrsprachig** - Deutsch und Englisch, umschaltbar mit `--lang en`
@@ -206,7 +206,7 @@ The problem: InspectCode produces a raw report (XML or SARIF/JSON) with hundreds
 - **Auto-fix** for 11 issue types with diff preview before applying
 - **History** - remember and reuse recent scan parameters
 - **Top 10 chart** - most frequent finding types, categories, and files at a glance
-- **Retro themes** - C64, Amiga, Atari ST and more via theme picker (Ctrl+P)
+- **31 retro themes** - via theme picker (Ctrl+P), see [textual-themes](https://github.com/michaelblaess/textual-themes)
 - **Whitelist** - ignore known issues via `whitelist.json`, toggle on/off and add findings directly in the TUI
 - **Persistent settings** - theme, log height and visibility are saved
 - **Multilingual** - German and English, switch with `--lang en`
