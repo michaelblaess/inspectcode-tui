@@ -39,9 +39,7 @@ class Report:
         elif first_char == "<":
             self._parse_xml(raw)
         else:
-            raise ValueError(
-                t("report.unknown_format", char=first_char)
-            )
+            raise ValueError(t("report.unknown_format", char=first_char))
 
         return self.findings
 
@@ -302,10 +300,7 @@ class Report:
         """Filtert Findings nach minimaler Severity."""
         severity_order = {"HINT": 0, "SUGGESTION": 1, "WARNING": 2, "ERROR": 3}
         min_level = severity_order.get(min_severity.upper(), 2)
-        return [
-            f for f in self.findings
-            if severity_order.get(f.severity.upper(), 0) >= min_level
-        ]
+        return [f for f in self.findings if severity_order.get(f.severity.upper(), 0) >= min_level]
 
 
 def _sarif_text(msg_obj: dict | None) -> str:

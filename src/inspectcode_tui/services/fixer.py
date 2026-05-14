@@ -13,6 +13,7 @@ from ..models.finding import Finding
 @dataclass
 class FixResult:
     """Ergebnis eines Fix-Versuchs."""
+
     success: bool
     message: str
     old_content: str = ""
@@ -139,16 +140,12 @@ class Fixer:
         }
         return methods.get(type_id)
 
-    def _fix_remove_line(
-        self, finding: Finding, lines: list[str], line_idx: int
-    ) -> str:
+    def _fix_remove_line(self, finding: Finding, lines: list[str], line_idx: int) -> str:
         """Entfernt eine Zeile komplett."""
         lines[line_idx] = ""
         return "".join(lines)
 
-    def _fix_empty_constructor(
-        self, finding: Finding, lines: list[str], line_idx: int
-    ) -> str:
+    def _fix_empty_constructor(self, finding: Finding, lines: list[str], line_idx: int) -> str:
         """Entfernt einen leeren Konstruktor (mehrzeilig)."""
         # Finde den Anfang und das Ende des Konstruktors
         start = line_idx
@@ -176,9 +173,7 @@ class Fixer:
 
         return "".join(lines)
 
-    def _fix_redundant_base_call(
-        self, finding: Finding, lines: list[str], line_idx: int
-    ) -> str:
+    def _fix_redundant_base_call(self, finding: Finding, lines: list[str], line_idx: int) -> str:
         """Entfernt redundanten base()-Aufruf."""
         line = lines[line_idx]
         # Muster: `: base()` entfernen
@@ -186,9 +181,7 @@ class Fixer:
         lines[line_idx] = new_line
         return "".join(lines)
 
-    def _fix_possible_intended_rethrow(
-        self, finding: Finding, lines: list[str], line_idx: int
-    ) -> str:
+    def _fix_possible_intended_rethrow(self, finding: Finding, lines: list[str], line_idx: int) -> str:
         """Ersetzt 'throw ex;' durch 'throw;' um Stacktrace zu erhalten.
 
         Beispiel:
@@ -200,9 +193,7 @@ class Fixer:
         lines[line_idx] = new_line
         return "".join(lines)
 
-    def _fix_redundant_base_qualifier(
-        self, finding: Finding, lines: list[str], line_idx: int
-    ) -> str:
+    def _fix_redundant_base_qualifier(self, finding: Finding, lines: list[str], line_idx: int) -> str:
         """Entfernt redundanten base.-Qualifier bei Methodenaufrufen.
 
         Beispiel:
@@ -214,9 +205,7 @@ class Fixer:
         lines[line_idx] = new_line
         return "".join(lines)
 
-    def _fix_constant_conditional_access(
-        self, finding: Finding, lines: list[str], line_idx: int
-    ) -> str:
+    def _fix_constant_conditional_access(self, finding: Finding, lines: list[str], line_idx: int) -> str:
         """Ersetzt '?.' durch '.' wenn das Objekt nie null sein kann.
 
         Beispiel:
@@ -229,9 +218,7 @@ class Fixer:
         lines[line_idx] = new_line
         return "".join(lines)
 
-    def _fix_string_indexof_culture(
-        self, finding: Finding, lines: list[str], line_idx: int
-    ) -> str:
+    def _fix_string_indexof_culture(self, finding: Finding, lines: list[str], line_idx: int) -> str:
         """Fuegt StringComparison.Ordinal zu IndexOf/LastIndexOf hinzu.
 
         Beispiele:
@@ -250,9 +237,7 @@ class Fixer:
         lines[line_idx] = new_line
         return "".join(lines)
 
-    def _fix_redundant_default_initializer(
-        self, finding: Finding, lines: list[str], line_idx: int
-    ) -> str:
+    def _fix_redundant_default_initializer(self, finding: Finding, lines: list[str], line_idx: int) -> str:
         """Entfernt redundante Default-Initialisierungen bei Feldern.
 
         Beispiele:
@@ -273,4 +258,3 @@ class Fixer:
         )
         lines[line_idx] = new_line
         return "".join(lines)
-

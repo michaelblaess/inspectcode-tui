@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import asyncio
 import tempfile
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable
 
 from ..i18n import t
 
@@ -40,12 +40,11 @@ class InspectOptions:
             Liste der Argumente.
         """
         if not self.output_path:
-            self.output_path = str(
-                Path(tempfile.gettempdir()) / "inspectcode-tui-results.xml"
-            )
+            self.output_path = str(Path(tempfile.gettempdir()) / "inspectcode-tui-results.xml")
 
         args = [
-            "jb", "inspectcode",
+            "jb",
+            "inspectcode",
             self.solution_path,
             f"--output={self.output_path}",
             f"--severity={self.severity}",
@@ -171,7 +170,10 @@ async def get_git_changed_files(
 
     try:
         process = await asyncio.create_subprocess_exec(
-            "git", "diff", "--name-only", commit,
+            "git",
+            "diff",
+            "--name-only",
+            commit,
             cwd=solution_dir,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,

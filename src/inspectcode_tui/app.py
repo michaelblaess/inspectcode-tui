@@ -19,7 +19,6 @@ from textual.widgets import (
     RichLog,
     Static,
 )
-
 from textual_themes import register_all
 
 from . import __version__, __year__
@@ -35,7 +34,6 @@ from .services.inspector import InspectOptions, get_git_changed_files, run_inspe
 from .widgets.code_view import CodeView
 from .widgets.findings_table import FindingsTable
 from .widgets.summary_panel import SummaryPanel
-
 
 # Log-Hoehe: min/max/step (Zeilen)
 LOG_HEIGHT_MIN = 5
@@ -212,10 +210,7 @@ class InspectCodeApp(App):
             before_count = len(self._findings)
             self._findings = self._report.filter_by_files(self._git_changed_files)
             self._write_log(
-                t("app.git_filter",
-                  found=len(self._findings),
-                  total=before_count,
-                  files=len(self._git_changed_files))
+                t("app.git_filter", found=len(self._findings), total=before_count, files=len(self._git_changed_files))
             )
 
         # Alle Findings (vor Whitelist) merken
@@ -225,9 +220,7 @@ class InspectCodeApp(App):
         if self._whitelist_active:
             whitelist_count = self._apply_whitelist()
             if whitelist_count > 0:
-                self._write_log(
-                    t("app.whitelist_ignored", count=whitelist_count)
-                )
+                self._write_log(t("app.whitelist_ignored", count=whitelist_count))
 
         self._refresh_findings_ui(report_path)
 
@@ -327,7 +320,9 @@ class InspectCodeApp(App):
             sol_dir = Path(self.solution_path).parent
             self._write_log(t("app.git_mode", commit=self.commit))
             self._git_changed_files = await get_git_changed_files(
-                sol_dir, self.commit, on_output=self._write_log,
+                sol_dir,
+                self.commit,
+                on_output=self._write_log,
             )
             if not self._git_changed_files:
                 self._write_log(t("app.no_cs_files"))
@@ -393,15 +388,11 @@ class InspectCodeApp(App):
         duration = _format_duration(int(elapsed * 1000))
         self.sub_title = t("app.scanning", bar=bar, duration=duration)
 
-    def on_findings_table_finding_selected(
-        self, event: FindingsTable.FindingSelected
-    ) -> None:
+    def on_findings_table_finding_selected(self, event: FindingsTable.FindingSelected) -> None:
         """Reagiert auf Doppelklick/Enter auf ein Finding."""
         self._show_code(event.finding)
 
-    def on_findings_table_finding_highlighted(
-        self, event: FindingsTable.FindingHighlighted
-    ) -> None:
+    def on_findings_table_finding_highlighted(self, event: FindingsTable.FindingHighlighted) -> None:
         """Aktualisiert Code-Ansicht bei Cursor-Bewegung (automatisch rechts)."""
         self._current_finding = event.finding
         self._show_code(event.finding)
@@ -515,6 +506,7 @@ class InspectCodeApp(App):
     def action_show_history(self) -> None:
         """Zeigt die Scan-History und laedt bei Auswahl die Parameter."""
         from .screens.history import HistoryScreen
+
         self.push_screen(HistoryScreen(), callback=self._on_history_selected)
 
     def _on_history_selected(self, entry: HistoryEntry | None) -> None:
@@ -555,6 +547,7 @@ class InspectCodeApp(App):
             return
 
         from .screens.top_findings import TopFindingsScreen
+
         self.push_screen(TopFindingsScreen(self._findings))
 
     def action_toggle_log(self) -> None:
@@ -588,6 +581,7 @@ class InspectCodeApp(App):
         """Fokussiert das Filter-Eingabefeld."""
         try:
             from textual.widgets import Input
+
             filter_input = self.query_one("#filter-bar", Input)
             filter_input.focus()
         except Exception:
@@ -597,6 +591,7 @@ class InspectCodeApp(App):
         """Leert den Filter."""
         try:
             from textual.widgets import Input
+
             filter_input = self.query_one("#filter-bar", Input)
             filter_input.value = ""
         except Exception:
@@ -649,9 +644,7 @@ class InspectCodeApp(App):
         bindings_list = self._bindings.key_to_bindings.get("w", [])
         for i, binding in enumerate(bindings_list):
             if binding.action == "toggle_whitelist":
-                self._bindings.key_to_bindings["w"][i] = dataclasses.replace(
-                    binding, description=label
-                )
+                self._bindings.key_to_bindings["w"][i] = dataclasses.replace(binding, description=label)
                 break
         self.refresh_bindings()
 
@@ -696,9 +689,7 @@ class InspectCodeApp(App):
             encoding="utf-8",
         )
 
-        self._write_log(
-            t("app.whitelist_added_log", type_id=finding.type_id, path=whitelist_path)
-        )
+        self._write_log(t("app.whitelist_added_log", type_id=finding.type_id, path=whitelist_path))
         self.notify(t("app.whitelist_added", type_id=finding.type_id))
 
         # Whitelist sofort neu anwenden
@@ -744,6 +735,7 @@ class InspectCodeApp(App):
     def action_show_about(self) -> None:
         """Zeigt den About-Dialog an."""
         from .screens.about import AboutScreen
+
         self.push_screen(AboutScreen())
 
     def check_action(self, action: str, parameters: tuple) -> bool | None:
@@ -758,8 +750,11 @@ class InspectCodeApp(App):
         """
         # Waehrend Scan: bestimmte Aktionen ausblenden
         if self._scan_running and action in (
-            "show_history", "run_scan", "show_top_findings",
-            "fix_selected", "show_diff",
+            "show_history",
+            "run_scan",
+            "show_top_findings",
+            "fix_selected",
+            "show_diff",
         ):
             return None
 

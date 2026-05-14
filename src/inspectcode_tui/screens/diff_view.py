@@ -78,6 +78,7 @@ class DiffViewScreen(ModalScreen[bool]):
             yield Static(self.diff_title, id="diff-title")
             yield RichLog(id="diff-content", highlight=True)
             from textual.containers import Horizontal
+
             with Horizontal(id="diff-close-bar"):
                 yield Button(t("diff.close"), variant="primary", id="btn-close")
 
@@ -89,7 +90,8 @@ class DiffViewScreen(ModalScreen[bool]):
         new_lines = self.new_content.splitlines()
 
         diff = difflib.unified_diff(
-            old_lines, new_lines,
+            old_lines,
+            new_lines,
             fromfile=self.old_label,
             tofile=self.new_label,
             lineterm="",

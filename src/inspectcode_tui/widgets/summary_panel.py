@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 from rich.text import Text
-from textual.app import ComposeResult, RenderResult
+from textual.app import RenderResult
 from textual.widget import Widget
-from textual.widgets import Static
 
 from ..i18n import t
 from ..models.finding import Finding

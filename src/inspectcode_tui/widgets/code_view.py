@@ -14,7 +14,6 @@ from textual.widgets import Static
 
 from ..i18n import t
 
-
 # Mapping von Dateiendungen zu Rich-Sprachen
 LANGUAGE_MAP = {
     ".cs": "csharp",
@@ -114,9 +113,7 @@ class CodeView(VerticalScroll, can_focus=True):
         content_widget = self.query_one("#code-content", Static)
 
         if not self._code:
-            content_widget.update(
-                Text(t("code.no_code"), style="dim italic")
-            )
+            content_widget.update(Text(t("code.no_code"), style="dim italic"))
             return
 
         syntax = Syntax(

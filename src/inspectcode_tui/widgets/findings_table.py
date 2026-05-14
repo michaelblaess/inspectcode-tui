@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
+from rich.text import Text
 from textual.app import ComposeResult
 from textual.containers import Vertical
+from textual.message import Message
 from textual.reactive import reactive
 from textual.widgets import DataTable, Input, Static
-from textual.message import Message
-from rich.text import Text
 
 from ..i18n import t
 from ..models.finding import Finding

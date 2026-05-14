@@ -6,9 +6,9 @@ from dataclasses import dataclass
 
 from rich.syntax import Syntax
 from textual.app import ComposeResult
-from textual.containers import Grid, Vertical
+from textual.containers import Vertical
 from textual.screen import ModalScreen
-from textual.widgets import Button, Label, RichLog, Static
+from textual.widgets import Button, RichLog, Static
 
 from ..i18n import t
 from ..models.finding import Finding
@@ -18,6 +18,7 @@ from ..services.fixer import FixResult
 @dataclass
 class FixDecision:
     """Ergebnis der Benutzer-Entscheidung im Fix-Dialog."""
+
     confirmed: bool
 
 
@@ -87,6 +88,7 @@ class ConfirmFixScreen(ModalScreen[FixDecision]):
             yield Static(self._build_info(), id="fix-info")
             yield RichLog(id="fix-preview", highlight=True)
             from textual.containers import Horizontal
+
             with Horizontal(id="fix-buttons"):
                 yield Button(t("confirm_fix.button_fix"), variant="success", id="btn-fix")
                 yield Button(t("confirm_fix.button_cancel"), variant="error", id="btn-cancel")
@@ -97,11 +99,13 @@ class ConfirmFixScreen(ModalScreen[FixDecision]):
 
         if self.preview.old_content and self.preview.new_content:
             import difflib
+
             old_lines = self.preview.old_content.splitlines()
             new_lines = self.preview.new_content.splitlines()
 
             diff = difflib.unified_diff(
-                old_lines, new_lines,
+                old_lines,
+                new_lines,
                 fromfile=t("confirm_fix.before"),
                 tofile=t("confirm_fix.after"),
                 lineterm="",

@@ -4,16 +4,15 @@ from __future__ import annotations
 
 from collections import Counter
 
+from rich.text import Text
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import VerticalScroll
 from textual.screen import ModalScreen
 from textual.widgets import Static
-from rich.text import Text
 
 from ..i18n import t
 from ..models.finding import Finding
-
 
 # Maximale Laenge fuer Labels in der Anzeige
 MAX_LABEL_LEN = 80
@@ -68,6 +67,7 @@ class TopFindingsScreen(ModalScreen):
     def _init_bindings(self) -> None:
         """Ersetzt die Platzhalter-Labels der Bindings."""
         import dataclasses
+
         for key, bindings_list in self._bindings.key_to_bindings.items():
             for i, binding in enumerate(bindings_list):
                 if binding.action == "close":
@@ -161,7 +161,7 @@ def _truncate(label: str, max_len: int) -> str:
     """
     if len(label) <= max_len:
         return label
-    return f"{label[:max_len - 3]}..."
+    return f"{label[: max_len - 3]}..."
 
 
 def _append_bar_entry(

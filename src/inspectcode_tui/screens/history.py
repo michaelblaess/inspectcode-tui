@@ -80,6 +80,7 @@ class HistoryScreen(ModalScreen[HistoryEntry | None]):
     def _init_bindings(self) -> None:
         """Ersetzt die Platzhalter-Labels der Bindings."""
         import dataclasses
+
         for key, bindings_list in self._bindings.key_to_bindings.items():
             for i, binding in enumerate(bindings_list):
                 if binding.action == "close":

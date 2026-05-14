@@ -30,9 +30,9 @@ class Finding:
     def severity_icon(self) -> str:
         """Gibt ein Icon fuer die Severity zurueck."""
         icons = {
-            "ERROR": "\u2718",     # ✘
-            "WARNING": "\u26A0",   # ⚠
-            "SUGGESTION": "\u2139", # ℹ
-            "HINT": "\u2022",      # •
+            "ERROR": "\u2718",  # ✘
+            "WARNING": "\u26a0",  # ⚠
+            "SUGGESTION": "\u2139",  # ℹ
+            "HINT": "\u2022",  # •
         }
         return icons.get(self.severity.upper(), "?")
