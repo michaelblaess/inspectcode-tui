@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import dataclasses
 import json
 import time
@@ -195,10 +196,7 @@ class InspectCodeApp(App):
             return
 
         # Solution-Dir ermitteln fuer Fixer
-        if self.solution_path:
-            sol_dir = Path(self.solution_path).parent
-        else:
-            sol_dir = Path(report_path).parent
+        sol_dir = Path(self.solution_path).parent if self.solution_path else Path(report_path).parent
         self._fixer = Fixer(sol_dir)
 
         # Filter nach Severity
@@ -782,10 +780,8 @@ class InspectCodeApp(App):
             line: Log-Nachricht (kann Rich-Markup enthalten).
         """
         self._log_lines.append(line)
-        try:
+        with contextlib.suppress(Exception):
             self.query_one("#scan-log", RichLog).write(line)
-        except Exception:
-            pass
 
 
 def _format_progress_bar(elapsed_s: float) -> str:

@@ -191,10 +191,7 @@ class Report:
 
             # Severity: result.level ueberschreibt rule default
             level = result.get("level", "")
-            if level:
-                severity = self._SARIF_LEVEL_MAP.get(level, "WARNING")
-            else:
-                severity = rule_info.get("severity", "WARNING")
+            severity = self._SARIF_LEVEL_MAP.get(level, "WARNING") if level else rule_info.get("severity", "WARNING")
 
             # Message
             message = _sarif_text(result.get("message"))
