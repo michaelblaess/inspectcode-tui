@@ -1,5 +1,14 @@
 # InspectCode TUI
 
+[![Stars](https://img.shields.io/github/stars/michaelblaess/inspectcode-tui?style=for-the-badge&logo=github&logoColor=white&labelColor=1e2228&color=fbbf24)](https://github.com/michaelblaess/inspectcode-tui/stargazers)
+[![Forks](https://img.shields.io/github/forks/michaelblaess/inspectcode-tui?style=for-the-badge&logo=github&logoColor=white&labelColor=1e2228&color=34d399)](https://github.com/michaelblaess/inspectcode-tui/network/members)
+[![Issues](https://img.shields.io/github/issues/michaelblaess/inspectcode-tui?style=for-the-badge&logo=github&logoColor=white&labelColor=1e2228&color=f87171)](https://github.com/michaelblaess/inspectcode-tui/issues)
+[![Pull Requests](https://img.shields.io/github/issues-pr/michaelblaess/inspectcode-tui?style=for-the-badge&logo=github&logoColor=white&labelColor=1e2228&color=a78bfa)](https://github.com/michaelblaess/inspectcode-tui/pulls)
+
+[![Last Commit](https://img.shields.io/github/last-commit/michaelblaess/inspectcode-tui?style=for-the-badge&logo=git&logoColor=white&labelColor=1e2228&color=3b82f6)](https://github.com/michaelblaess/inspectcode-tui/commits/main)
+[![License](https://img.shields.io/badge/license-Apache_2.0-3b82f6?style=for-the-badge&labelColor=1e2228)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.10+-3b82f6?style=for-the-badge&logo=python&logoColor=white&labelColor=1e2228)](https://www.python.org/)
+
 Terminal-UI zum Durchsuchen und Beheben von C# und .NET-Problemen mit [InspectCode](https://www.jetbrains.com/help/resharper/InspectCode.html) von JetBrains.
 
 A terminal user interface for browsing and fixing C# and .NET issues with [InspectCode](https://www.jetbrains.com/help/resharper/InspectCode.html) by JetBrains.
