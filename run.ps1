@@ -1,9 +1,11 @@
-$env:PYTHONPATH = Join-Path $PSScriptRoot "src"
+#Requires -Version 5.1
+# run.ps1 - starts inspectcode-tui from source.
+$ErrorActionPreference = "Stop"
+Set-Location $PSScriptRoot
 
-if (Get-Command python -ErrorAction SilentlyContinue) {
-    python -m inspectcode_tui @args
-} else {
-    Write-Host "Python nicht gefunden! Bitte Python 3.10+ installieren und zum PATH hinzufuegen." -ForegroundColor Red
-    Write-Host "  winget install Python.Python.3.12"
-    Read-Host "Eingabetaste druecken"
+if (-not (Test-Path ".venv")) {
+    Write-Host "Please run .\bootstrap.ps1 first." -ForegroundColor Red
+    exit 1
 }
+
+& ".venv\Scripts\python.exe" -m inspectcode_tui @args
