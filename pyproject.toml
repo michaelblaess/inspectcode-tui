@@ -11,6 +11,7 @@ dependencies = [
     "textual>=0.40",
     "rich>=13.0",
     "textual-themes @ git+https://github.com/michaelblaess/textual-themes.git",
+    "textual-widgets @ git+https://github.com/michaelblaess/textual-widgets.git",
 ]
 
 [project.optional-dependencies]

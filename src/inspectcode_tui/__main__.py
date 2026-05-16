@@ -5,6 +5,10 @@ from __future__ import annotations
 import argparse
 import sys
 
+from textual_widgets import reset_terminal_title, set_terminal_title
+
+from inspectcode_tui import __version__
+
 from .i18n import load_locale, t
 from .models.settings import Settings
 
@@ -92,15 +96,20 @@ def main() -> None:
 
     from .app import InspectCodeApp
 
-    app = InspectCodeApp(
-        solution_path=args.solution or "",
-        project=args.project,
-        xml_path=args.xml,
-        severity=args.severity,
-        no_build=no_build,
-        commit=args.commit,
-    )
-    app.run()
+    # Terminal-Tab-Titel setzen - Textual macht das nicht selbst.
+    set_terminal_title(f"⚙ inspectcode-tui v{__version__}")
+    try:
+        app = InspectCodeApp(
+            solution_path=args.solution or "",
+            project=args.project,
+            xml_path=args.xml,
+            severity=args.severity,
+            no_build=no_build,
+            commit=args.commit,
+        )
+        app.run()
+    finally:
+        reset_terminal_title()
 
 
 if __name__ == "__main__":
