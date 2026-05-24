@@ -9,8 +9,13 @@ from textual_widgets import reset_terminal_title, set_terminal_title
 
 from inspectcode_tui import __version__
 
-from .i18n import load_locale, t
-from .models.settings import Settings
+# Absolute Imports, damit das Nuitka-Standalone-Kompilat funktioniert:
+# Nuitka kompiliert __main__.py als Top-Level (ohne Parent-Package), dort
+# scheitern relative Imports mit "attempted relative import with no known
+# parent package". 'python -m inspectcode_tui' funktioniert mit absoluten
+# Imports genauso, weil das Paket dann im sys.path liegt.
+from inspectcode_tui.i18n import load_locale, t
+from inspectcode_tui.models.settings import Settings
 
 
 def main() -> None:
