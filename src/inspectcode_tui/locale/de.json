@@ -64,6 +64,8 @@
   "app.git_filter": "Git-Filter: {found} von {total} Findings in {files} geaenderten Dateien",
   "app.history_loaded": "[bold]History: Parameter uebernommen[/bold]",
   "app.start_scan_s": "[dim]Scan mit 's' starten[/dim]",
+  "log.theme_active": "Theme: {name}",
+  "log.theme_unknown": "Theme \"{name}\" ist nicht bekannt - Standard verwendet",
 
   "about.title": "InspectCode TUI",
   "about.description": "Terminal UI fuer JetBrains InspectCode Ergebnisse",
