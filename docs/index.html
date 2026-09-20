@@ -160,6 +160,18 @@
     .fix-table td:last-child {
       color: var(--text-secondary);
     }
+
+    /* Lange Bezeichner wie RedundantDefaultMemberInitializer sprengen sonst
+       die Tabelle und erzeugen auf dem Handy seitliches Scrollen. */
+    .fix-table td:first-child,
+    .fix-table code {
+      overflow-wrap: anywhere;
+    }
+    @media (max-width: 640px) {
+      .fix-table { font-size: 0.8rem; }
+      .fix-table th,
+      .fix-table td { padding: 0.45rem 0.5rem; }
+    }
   </style>
 </head>
 <body>
