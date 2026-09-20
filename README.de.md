@@ -7,6 +7,10 @@
 
 ---
 
+<p align="center">
+  <img src="docs/banner.jpg" alt="inspectcode-tui - Befundtabelle mit Schweregraden, Kategorien-Diagramm und Log" width="100%">
+</p>
+
 [![Stars](https://img.shields.io/github/stars/michaelblaess/inspectcode-tui?logo=github&logoColor=white&color=fbbf24)](https://github.com/michaelblaess/inspectcode-tui/stargazers)
 [![Forks](https://img.shields.io/github/forks/michaelblaess/inspectcode-tui?logo=github&logoColor=white&color=34d399)](https://github.com/michaelblaess/inspectcode-tui/network/members)
 [![Issues](https://img.shields.io/github/issues/michaelblaess/inspectcode-tui?logo=github&logoColor=white&color=f87171)](https://github.com/michaelblaess/inspectcode-tui/issues)
