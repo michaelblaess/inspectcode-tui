@@ -1,17 +1,31 @@
 [build-system]
-requires = ["setuptools>=68.0", "wheel"]
+requires = ["setuptools>=77.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "inspectcode-tui"
-version = "2.4.1"
+version = "2.4.2"
 description = "TUI for JetBrains InspectCode results"
+readme = "README.md"
+license = "Apache-2.0"
 requires-python = ">=3.12"
+authors = [
+    { name = "Michael Blaess" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Quality Assurance",
+]
 dependencies = [
     "textual>=0.40",
     "rich>=13.0",
-    "textual-themes @ git+https://github.com/michaelblaess/textual-themes.git",
-    "textual-widgets @ git+https://github.com/michaelblaess/textual-widgets.git",
+    "textual-themes[textual]>=0.15.1",
+    "textual-widgets>=0.32.1",
 ]
 
 [project.optional-dependencies]
@@ -26,7 +40,12 @@ dev = [
 ]
 
 [tool.setuptools.package-data]
-inspectcode_tui = ["locale/*.json"]
+inspectcode_tui = ["locale/*.json", "*.tcss"]
+
+[project.urls]
+Homepage = "https://github.com/michaelblaess/inspectcode-tui"
+Repository = "https://github.com/michaelblaess/inspectcode-tui"
+Issues = "https://github.com/michaelblaess/inspectcode-tui/issues"
 
 [project.scripts]
 inspectcode-tui = "inspectcode_tui.__main__:main"
