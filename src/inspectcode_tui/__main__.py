@@ -99,7 +99,7 @@ def main() -> None:
 
     no_build = not args.build if args.build else args.no_build
 
-    from .app import InspectCodeApp
+    from inspectcode_tui.app import InspectCodeApp
 
     # Terminal-Tab-Titel setzen - Textual macht das nicht selbst.
     set_terminal_title(f"⚙ inspectcode-tui v{__version__}")

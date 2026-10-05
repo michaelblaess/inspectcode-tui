@@ -94,7 +94,17 @@ irm https://raw.githubusercontent.com/michaelblaess/inspectcode-tui/main/install
 curl -fsSL https://raw.githubusercontent.com/michaelblaess/inspectcode-tui/main/install.sh | bash
 ```
 
-### From Source (Python 3.10+)
+### Run without installing (uv)
+
+With [uv](https://docs.astral.sh/uv/) installed (Python 3.12 or newer):
+
+```bash
+uvx inspectcode-tui
+```
+
+Or install it from [PyPI](https://pypi.org/project/inspectcode-tui/) with `pip install inspectcode-tui`.
+
+### From Source (Python 3.12+)
 
 ```bash
 git clone https://github.com/michaelblaess/inspectcode-tui.git

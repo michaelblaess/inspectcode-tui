@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "InspectCode",
+          "version": "2025.2.0",
+          "rules": [
+            {
+              "id": "RedundantUsingDirective",
+              "shortDescription": { "text": "Redundant using directive" },
+              "helpUri": "https://www.jetbrains.com/help/resharper/RedundantUsingDirective.html",
+              "defaultConfiguration": { "level": "warning" },
+              "relationships": [
+                { "target": { "id": "CodeRedundancy", "toolComponent": { "name": "Redundancies in Code" } } }
+              ]
+            },
+            {
+              "id": "CSharpErrors",
+              "shortDescription": { "text": "C# Compiler Errors" },
+              "defaultConfiguration": { "level": "error" },
+              "relationships": [
+                { "target": { "id": "CompilerErrors", "toolComponent": { "name": "C# Compiler Errors" } } }
+              ]
+            },
+            {
+              "id": "ConvertToAutoProperty",
+              "shortDescription": { "text": "Convert property into auto-property" },
+              "defaultConfiguration": { "level": "note" }
+            }
+          ]
+        }
+      },
+      "properties": { "solutionName": "Demo.sln" },
+      "results": [
+        {
+          "ruleId": "RedundantUsingDirective",
+          "ruleIndex": 0,
+          "message": { "text": "Using directive is not required by the code and can be safely removed" },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": { "uri": "Demo.Core/Services/OrderService.cs" },
+                "region": { "startLine": 3, "charOffset": 40, "charLength": 15 }
+              }
+            }
+          ],
+          "logicalLocations": [
+            { "name": "OrderService", "kind": "type" },
+            { "name": "Demo.Core", "kind": "module" }
+          ]
+        },
+        {
+          "ruleId": "CSharpErrors",
+          "ruleIndex": 1,
+          "message": { "text": "Cannot resolve symbol 'Customer'" },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": { "uri": "Demo.Core/Models/Order.cs" },
+                "region": { "startLine": 12, "startColumn": 9 }
+              }
+            }
+          ],
+          "logicalLocations": [{ "name": "Demo.Core", "kind": "module" }]
+        },
+        {
+          "ruleId": "ConvertToAutoProperty",
+          "level": "error",
+          "message": { "text": "Convert into auto-property" },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": { "uri": "Demo.Web/Models/Settings.cs" },
+                "region": { "startLine": 20 }
+              }
+            }
+          ],
+          "logicalLocations": [{ "name": "Demo.Web" }]
+        }
+      ]
+    }
+  ]
+}
