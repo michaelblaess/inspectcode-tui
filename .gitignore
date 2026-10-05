@@ -34,3 +34,5 @@ Desktop.ini
 # Claude
 .claude/
 Session.md
+# Test-Fixtures sind gewollte XML-Dateien
+!tests/fixtures/*.xml

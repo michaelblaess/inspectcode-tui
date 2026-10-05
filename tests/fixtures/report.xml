@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report ToolsVersion="2024.3.5">
+  <Information>
+    <Solution>Demo.sln</Solution>
+    <InspectionScope>
+      <Element>Solution</Element>
+    </InspectionScope>
+  </Information>
+  <IssueTypes>
+    <IssueType Id="RedundantUsingDirective" Category="Redundancies in Code" CategoryId="CodeRedundancy" Description="Redundant using directive" Severity="WARNING" WikiUrl="https://www.jetbrains.com/help/resharper/RedundantUsingDirective.html" />
+    <IssueType Id="CSharpErrors" Category="C# Compiler Errors" CategoryId="CompilerErrors" Description="C# Compiler Errors" Severity="ERROR" />
+    <IssueType Id="ConvertToAutoProperty" Category="Common Practices and Code Improvements" CategoryId="BestPractice" Description="Convert property into auto-property" Severity="SUGGESTION" />
+    <IssueType Id="InconsistentNaming" Category="Constraints Violations" CategoryId="ConstraintViolation" Description="Inconsistent Naming" Severity="HINT" />
+  </IssueTypes>
+  <Issues>
+    <Project Name="Demo.Core">
+      <Issue TypeId="RedundantUsingDirective" File="Demo.Core\Services\OrderService.cs" Offset="0-13" Line="1" Message="Using directive is not required by the code and can be safely removed" />
+      <Issue TypeId="RedundantUsingDirective" File="Demo.Core\Services\OrderService.cs" Offset="14-40" Line="2" Message="Using directive is not required by the code and can be safely removed" />
+      <Issue TypeId="CSharpErrors" File="Demo.Core\Models\Order.cs" Offset="120-131" Line="12" Message="Cannot resolve symbol 'Customer'" />
+      <Issue TypeId="ConvertToAutoProperty" File="Demo.Core\Models\Order.cs" Offset="200-230" Line="20" Message="Convert into auto-property" />
+    </Project>
+    <Project Name="Demo.Web">
+      <Issue TypeId="InconsistentNaming" File="Demo.Web\Controllers\HomeController.cs" Offset="50-58" Line="7" Message="Name '_logger' does not match rule 'Instance fields (private)'" />
+      <Issue TypeId="UnknownInspection" File="Demo.Web\Startup.cs" Offset="1-2" Line="abc" Message="Issue ohne IssueType" />
+    </Project>
+  </Issues>
+</Report>
