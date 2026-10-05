@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "inspectcode-tui"
-version = "2.4.2"
+version = "2.4.3"
 description = "TUI for JetBrains InspectCode results"
 readme = "README.md"
 license = "Apache-2.0"
